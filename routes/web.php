@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {return view('welcome');});
 
-Route::get('graph', 'App\Http\Controllers\ApiController@getMailData');
-Route::get('graph1', 'App\Http\Controllers\ApiController@getUsers');
-Route::get('graph2', 'App\Http\Controllers\ApiController@getEmails');
+Route::get('graph', 'App\Http\Controllers\ApiController@getUsers');
+Route::get('graph1', 'App\Http\Controllers\ApiController@getEmails');
+Route::get('graph2', 'App\Http\Controllers\ApiController@getCategorie');
+Route::get('graph3', 'App\Http\Controllers\ApiController@updateEmail');
+Route::get('graph4', 'App\Http\Controllers\ApiController@getEmailCategorie');
 Route::get('layout',  function(){
     return view('layout');
 });

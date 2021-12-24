@@ -44,11 +44,16 @@ class ApiController extends BaseController
         $accessToken = $this->getAccessToken();
         $graph = new Graph();
         $graph->setAccessToken($accessToken);
+
+
         $users = $graph->createRequest("GET", "/users")
             ->setReturnType(Model\User::class)
             ->execute();
         dd($users);
-            // return view('show', ["users"=>$users]);
+        foreach ($users as $user) {
+
+            echo $user->getGivenName() . '  -  ' . $user->getId() . '<br>';
+        }
     }
 
     function getEmails()
@@ -57,10 +62,43 @@ class ApiController extends BaseController
         $graph = new Graph();
         $graph->setAccessToken($accessToken);
 
-        $mails = $graph->createRequest("GET", '/users/' . config('msgraph.userId') . '/mailFolders(\'Inbox\')/messages?$select=sender,subject,body')
+        $mails = $graph->createRequest("GET", '/users/' . config('msgraph.userId') . '/mailFolders(\'Inbox\')/messages?$select=sender,subject,body&$top=50')
             ->setReturnType(Model\Message::class)
             ->execute();
-           // dd($mails);
-            return view('layout', ["emails"=>$mails]);
+        //dd($mails);
+        return view('layout', ["emails" => $mails]);
+    }
+    function getCategorie()
+    {
+        $accessToken = $this->getAccessToken();
+        $graph = new Graph();
+        $graph->setAccessToken($accessToken);
+        $categories = $graph->createRequest("GET", '/users/' . config('msgraph.userId') . '/outlook/masterCategories/')
+            ->execute();
+           // dd($categories);
+        return view('categories', ["categories" => $categories->getBody()]);
+    }
+    function updateEmail()
+    {
+        $accessToken = $this->getAccessToken();
+        $graph = new Graph();
+        $graph->setAccessToken($accessToken);
+        $mails = $graph->createRequest("PATCH", '/users/' . config('msgraph.userId') . '/messages/AAMkADg1MmE2NmFmLTNhMDgtNDZkZS1iZjA4LTQ0NWU1ZTU4NzkyNQBGAAAAAADbsLGKKMzxRJSVo4YtMci9BwB5T26qf8tiRrkxQjxs2P7UAAAAAAEJAAB5T26qf8tiRrkxQjxs2P7UAANWxmFuAAA=')
+            ->attachBody(array("Subject" => "New Subject"))
+            ->execute();
+        dd($mails);
+    }
+    function getEmailCategorie()
+    {
+        $accessToken = $this->getAccessToken();
+        $a = 'CQAAABYAAAB5T26qf8tiRrkxQjxs2P7UAANsyaim';
+        $graph = new Graph();
+        $graph->setAccessToken($accessToken);
+        //$mails = $graph->createRequest("GET", '/users/' . config('msgraph.userId') . '/mailFolders(\'Inbox\')/messages?$filter=startswith(changeKey,'.'CQAAABYAAAB5T26qf8tiRr'.')')
+        //$mails = $graph->createRequest("GET", '/users/' . config('msgraph.userId') . '/mailFolders(\'Inbox\')/messages?$select=sender,subject,body&$filter=categories/any(a:a eq \'Support\'')
+        $mails = $graph->createRequest("GET", '/users/' . config('msgraph.userId') . '/mailFolders/AAMkADg1MmE2NmFmLTNhMDgtNDZkZS1iZjA4LTQ0NWU1ZTU4NzkyNQAuAAAAAADbsLGKKMzxRJSVo4YtMci9AQB5T26qf8tiRrkxQjxs2P7UAAAAAAEMAAA=/messages?$select=categories,sender&$top=30&$filter=categories/any(a:a eq \'Support\')')
+            ->setReturnType(Model\Message::class)
+            ->execute();
+        dd($mails);
     }
 }
